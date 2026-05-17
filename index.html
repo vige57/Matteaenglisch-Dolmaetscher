@@ -953,10 +953,60 @@
 </script>
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registriert', reg))
-                    .catch(err => console.log('Service Worker Fehler', err));
+            window.addEventListener('load', async () => {
+                try{
+                    const reg = await navigator.serviceWorker.register('./sw.js');
+                    console.log('Service Worker registriert', reg);
+
+                    function createUpdateBanner(reg){
+                        if(document.getElementById('swUpdateBanner')) return;
+                        const banner=document.createElement('div');
+                        banner.id='swUpdateBanner';
+                        banner.style.position='fixed';banner.style.left='0';banner.style.right='0';banner.style.bottom='0';banner.style.display='flex';banner.style.justifyContent='center';banner.style.zIndex='9999';
+                        banner.innerHTML=`<div style="background:#111;color:#fff;padding:0.6rem 1rem;border-radius:8px;margin:0.6rem;display:flex;gap:0.6rem;align-items:center;font-weight:700;">
+                            <span>Neue Version verfügbar</span>
+                            <button id="swRefreshBtn" style="background:#16a34a;border:none;color:#fff;padding:0.35rem 0.7rem;border-radius:6px;cursor:pointer;font-weight:700;">Jetzt neu laden</button>
+                            <button id="swDismissBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:#fff;padding:0.35rem 0.6rem;border-radius:6px;cursor:pointer;">Später</button>
+                        </div>`;
+                        document.body.appendChild(banner);
+                        document.getElementById('swRefreshBtn').addEventListener('click', ()=>{
+                            if(reg.waiting){ reg.waiting.postMessage({action:'skipWaiting'}); }
+                        });
+                        document.getElementById('swDismissBtn').addEventListener('click', ()=>{ banner.remove(); });
+                    }
+
+                    // If there's an already waiting worker, prompt user
+                    if(reg.waiting){ createUpdateBanner(reg); }
+
+                    reg.addEventListener('updatefound', ()=>{
+                        const newWorker = reg.installing;
+                        if(!newWorker) return;
+                        newWorker.addEventListener('statechange', ()=>{
+                            if(newWorker.state === 'installed'){
+                                if(navigator.serviceWorker.controller){
+                                    // new update available
+                                    createUpdateBanner(reg);
+                                } else {
+                                    console.log('Content cached for offline use.');
+                                }
+                            }
+                        });
+                    });
+
+                    // When the new SW activates and takes control, reload to use it
+                    let refreshing = false;
+                    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+                        if(refreshing) return; refreshing = true; window.location.reload();
+                    });
+
+                    // Optional: listen to messages from SW
+                    navigator.serviceWorker.addEventListener('message', (evt)=>{
+                        if(evt.data && evt.data.type === 'SW_ACTIVATED'){
+                            console.log('SW activated, version', evt.data.version);
+                        }
+                    });
+
+                }catch(err){ console.log('Service Worker Fehler', err); }
             });
         }
     </script>

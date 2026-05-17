@@ -64,3 +64,29 @@ Sie können die `.html` Datei auch einfach lokal in einem Browser öffnen. In di
 
 ---
 *Erstellt für die Matteänglisch-Community.*
+
+## Cache & Update‑Handhabung
+
+Dieses Projekt nutzt einen Service Worker (`sw.js`) zur Offline‑Fähigkeit. Kurz zusammengefasst:
+
+- **Versionierung:** Die SW liest die App‑Version aus dem Feld `version` in `manifest.json`. Erhöhe diese Version (z. B. `1.7.5` → `1.7.6`) bei einem Release, damit der neue Service Worker eine neue Cache‑Bezeichnung verwendet.
+- **Was passiert bei einem Version‑Bump:** Beim nächsten Laden installiert der Browser den neuen SW, `skipWaiting()` sorgt für schnellen Wechsel; beim `activate` werden alte Caches gelöscht.
+- **Offline‑Fallback:** Eine einfache `offline.html` wird precached; wenn eine Navigation fehlschlägt (offline), liefert der SW diese Seite.
+- **Manuelles Leeren (Entwickler):** DevTools → Application → Service Workers → `Unregister` und unter `Clear storage` die Caches löschen.
+
+Testing (lokal):
+
+1. Starte einen lokalen HTTP‑Server im Projektverzeichnis (SW funktioniert auf `localhost` ohne HTTPS):
+
+```bash
+npx http-server . -p 8080
+```
+
+2. Öffne `http://localhost:8080` in Chrome. DevTools → Application → Service Workers prüfen.
+3. Update‑Flow testen: Erhöhe `manifest.json:version`, lade die Seite neu — es sollte ein Update‑Banner erscheinen; wähle "Jetzt neu laden", der neue SW wird aktiv und die Seite aktualisiert.
+4. Offline testen: Seite laden, dann DevTools → Network → Offline, navigiere → `offline.html` wird gezeigt.
+
+Release‑Hinweis:
+
+- Dokumentiere den `manifest.json`‑Version‑Bump in `CHANGELOG.md` bzw. Release‑Notes, damit Deployments und Cache‑Bumps nachvollziehbar sind.
+- Optional: Eine CI‑Action kann prüfen, ob `manifest.json` und `sw.js` Versionen zusammenpassen.
