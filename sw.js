@@ -1,4 +1,4 @@
-const CACHE_NAME = 'matte-dolmetscher-v1';
+const CACHE_NAME = 'matte-dolmetscher-v1.7.5';
 const ASSETS = [
   './index.html',
   './manifest.json',
