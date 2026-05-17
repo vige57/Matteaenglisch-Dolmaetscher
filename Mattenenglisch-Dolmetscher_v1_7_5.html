@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matteänglisch-Dolmetscher</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#c8193f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Dolmetscher">
-    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
         :root {
             --red: #c8193f; --red-light: #f9e0e6; --blue-deep: #1a2e4a;
@@ -33,7 +27,12 @@
         h1 { font-family: 'Trebuchet MS','Gill Sans','Gill Sans MT',Calibri,'Century Gothic',Futura,Arial,sans-serif; font-size: clamp(1.7rem,4.8vw,2.8rem); font-weight: 900; color: var(--red); line-height: 1.05; letter-spacing: -0.02em; max-width: 100%; width: fit-content; }
         .card { background: var(--warm-white); border-radius: var(--radius); box-shadow: var(--shadow-card); overflow: hidden; border: 1px solid rgba(26,46,74,0.07); }
         .card-inner { padding: 2rem 2rem 2.5rem; }
-        .input-header { display: flex; align-items: center; justify-content: space-between; }
+        .input-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.3rem; }
+        .input-btns { display: flex; gap: 0.4rem; align-items: center; }
+        @media (max-width: 520px) {
+            .input-header { flex-direction: column; align-items: flex-start; }
+            .input-btns { width: 100%; }
+        }
         .btn-clear { font-family: inherit; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); background: none; border: 1.5px solid #d1dae6; border-radius: 999px; padding: 0.25rem 0.75rem; cursor: pointer; transition: color 0.15s,border-color 0.15s,background 0.15s; letter-spacing: 0.03em; }
         .btn-clear:hover { color: var(--red); border-color: var(--red); background: var(--red-light); }
         .section-label { display: flex; align-items: center; gap: 0.55rem; font-size: 0.92rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem; }
@@ -109,7 +108,7 @@
         #output .word-token:hover { background: rgba(212,168,75,0.18); }
         #output .word-token.selected { background: rgba(212,168,75,0.30); outline: 2px solid var(--gold); }
         #lernpanel { overflow: hidden; max-height: 0; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1),opacity 0.3s; opacity: 0; }
-        #lernpanel.open { max-height: 520px; opacity: 1; }
+        #lernpanel.open { max-height: 1200px; opacity: 1; }
         .lernpanel-inner { margin-top: 0.9rem; background: linear-gradient(135deg,#f0fdf4 0%,#f8fff8 100%); border: 1.5px solid #bbf7d0; border-radius: 0.875rem; padding: 1.1rem 1.25rem 1.2rem; }
         .lern-header { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: #15803d; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
         .lern-hint { font-size: 0.8rem; color: #6b7a8f; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: 0; }
@@ -134,8 +133,7 @@
         .btn-player:active { transform: scale(0.93); }
         .btn-player:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
         /* Overlapping play/pause container – nur noch Play */
-        .btn-pp-wrap { position: relative; width: 2.6rem; height: 2.6rem; flex-shrink: 0; }
-        .btn-player-play { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; font-family: inherit; font-weight: 700; line-height: 1; font-size: 1.1rem; background: #16a34a; color: #fff; box-shadow: 0 3px 10px rgba(22,163,74,0.28); transition: background 0.12s, transform 0.1s; }
+        .btn-player-play { width: 2.6rem; height: 2.6rem; border-radius: 50%; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; font-family: inherit; font-weight: 700; line-height: 1; font-size: 1.1rem; background: #16a34a; color: #fff; box-shadow: 0 3px 10px rgba(22,163,74,0.28); transition: background 0.12s, box-shadow 0.12s, transform 0.1s; flex-shrink: 0; }
         .btn-player-play:hover { background: #15803d; }
         .btn-player-play:active { transform: scale(0.93); }
         /* Stop button */
@@ -195,12 +193,28 @@
         </div>
     </div>
 
+    <!-- Favoriten Modal -->
+    <div class="modal-backdrop" id="modalFavs" onclick="closeModalOutside(event,'modalFavs')">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" style="color:#1a2e4a;">📚 Textbibliothek</div>
+                <button class="modal-close" onclick="closeModal('modalFavs')">✕</button>
+            </div>
+            <div class="modal-body" id="favsModalBody">
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-stripe"></div>
         <div class="card-inner">
             <div class="input-header">
                 <div class="section-label" style="margin-bottom:0"><span class="dot"></span> Bärndütsch</div>
-                <button class="btn-clear" onclick="clearInput()">✕ Löschen</button>
+                <div class="input-btns">
+                    <button class="btn-clear" onclick="favSave()" title="Als Favorit speichern">★ Speichern</button>
+                    <button class="btn-clear" onclick="favRememberCursor();openModal('modalFavs')" title="Textbibliothek">📚</button>
+                    <button class="btn-clear" onclick="clearInput()">✕ Löschen</button>
+                </div>
             </div>
             <div style="height:0.6rem"></div>
             <textarea id="input" placeholder="schryb hie…" spellcheck="false"></textarea>
@@ -285,7 +299,7 @@
         else translate();
     });
 
-    function openModal(id)            { document.getElementById(id).classList.add('open'); }
+    function openModal(id)            { document.getElementById(id).classList.add('open'); if(id==='modalFavs') renderFavsModal(); }
     function closeModal(id)           { document.getElementById(id).classList.remove('open'); }
     function closeModalOutside(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
     document.addEventListener('keydown', e => {
@@ -411,7 +425,7 @@
             if(VERBOTENE_REST.includes(char)){forbiddenCount++;lastForbidden=char;cleanC+='e';}
             else cleanC+=char;
         }
-        if(forbiddenCount>1)return{token:{type:'plain',value:word+punctuation},warning:`"${word}": Zu viele unerlaubte Selbstlaute.`};
+        if(forbiddenCount>1)return{token:{type:'plain',value:word+punctuation},warning:`"${word}": Zu viele unerlaubte Selbstlaute: Wort mit "-" trennen.`};
         const warning=forbiddenCount===1?`"${word}": Vokal "${lastForbidden}" durch "e" ersetzt.`:null;
         const prefix=startsWithUpper?'I':'i';
         // cons stores original case for display in Lernmodus
@@ -478,6 +492,8 @@
         el.classList.add('selected');
         selectedWordEl=el; selectedTokenIdx=tokenIdx;
         showLernDetails(lastTokens[tokenIdx]);
+        // Auto-start animation on word click
+        setTimeout(()=>playerPlay(), 80);
     }
 
     // animSpeed: higher = faster
@@ -516,7 +532,16 @@
     // Update player button states – only play button left to manage
     function updatePlayerBtns(){
         const btnPlay=document.getElementById('btnPlay');
-        if(btnPlay) btnPlay.style.background = seqRunning ? '#15803d' : '#16a34a';
+        if(btnPlay) btnPlay.style.opacity='1';
+        const st=document.getElementById('playerStatus');
+        if(!st) return;
+        if(seqRunning){
+            st.textContent='läuft…';
+            st.style.color='#16a34a';
+        } else {
+            st.textContent='pausiert';
+            st.style.color='#f87171';
+        }
     }
 
     // ── Player controls ───────────────────────────────────────────
@@ -584,11 +609,14 @@
                 // Extra 2 Sek. wenn Sondermeldung sichtbar (Vokalstart o.ä.)
                 const specialEl = document.getElementById('animSpecial');
                 const hasSpecial = specialEl && specialEl.style.opacity === '1';
+                // Extra 1 Sek. wenn Aussprache-Hinweis sichtbar
+                const ausspEl = document.getElementById('animAussprache');
+                const hasAusspr = ausspEl && ausspEl.style.opacity === '1';
                 const nt=setTimeout(()=>{
                     if(!seqRunning) return;
                     seqPos++;
                     playSeqStep();
-                }, 2500 + (hasSpecial ? 2000 : 0));
+                }, 2500 + (hasSpecial ? 2000 : 0) + (hasAusspr ? 1000 : 0));
                 seqTimeouts.push(nt);
             });
         }, 80);
@@ -621,11 +649,10 @@
         let html=`
         <div class="anim-controls">
             <button class="btn-player" id="btnPrev" onclick="playerPrev()" title="Vorheriges Wort" style="font-size:0.9rem;">◀</button>
-            <div class="btn-pp-wrap">
-                <button class="btn-player-play" id="btnPlay" onclick="playerPlay()" title="Start">▶</button>
-            </div>
+            <button class="btn-player-play" id="btnPlay" onclick="playerPlay()" title="Start">▶</button>
             <button class="btn-player" id="btnNext" onclick="playerNext()" title="Nächstes Wort">▶</button>
             <button class="btn-player btn-player-stop" id="btnStop" onclick="playerStop()" title="Stop">■</button>
+            <span id="playerStatus" style="font-size:0.75rem;font-weight:700;color:#f87171;margin-left:0.3rem;">pausiert</span>
         </div>`;
 
         if(hasVowelStart){
@@ -634,7 +661,7 @@
 
         html+=`<div class="lern-rule">
             <strong>Schritt 1:</strong> Konsonanten und 1. Vokal abtrennen &amp; durch «I / i» ersetzen.<br>
-            <strong>Schritt 2:</strong> Vokal + Konsonanten ans Ende – Vokal wird zu «e».
+            <strong>Schritt 2:</strong> Konsonanten + Vokal ans Ende – Vokal wird zu «e».
         </div>`;
 
         html+=`<div class="anim-grid">
@@ -656,13 +683,13 @@
                 <div class="lern-tile rest">${midDisplay?escHtml(midDisplay):'<span style="opacity:.35">–</span>'}</div>
             </div>
 
-            <div class="ag-cell ag-arrow" style="grid-column:1;grid-row:3;opacity:0;transition:opacity 0.4s;color:#d71b51;font-weight:900;" id="animArrow0">↳</div>
+            <div class="ag-cell ag-arrow" style="grid-column:1;grid-row:3;opacity:0;transition:opacity 0.4s;color:#d71b51;font-weight:900;" id="animArrow0">${hasVowelStart ? '' : '↳'}</div>
             <div style="grid-column:2;grid-row:3;"></div>
             <div class="ag-cell ag-arrow" style="grid-column:3;grid-row:3;opacity:0;transition:opacity 0.4s;" id="animArrow1">↓</div>
             <div style="grid-column:4;grid-row:3;"></div>
             <div class="ag-cell ag-arrow" style="grid-column:5;grid-row:3;opacity:0;transition:opacity 0.4s;" id="animArrow2">↓</div>
             <div style="grid-column:6;grid-row:3;"></div>
-            <div class="ag-cell ag-arrow" style="grid-column:7;grid-row:3;opacity:0;transition:opacity 0.4s;color:#d71b51;font-weight:900;" id="animArrow3">↴</div>
+            <div class="ag-cell ag-arrow" style="grid-column:7;grid-row:3;opacity:0;transition:opacity 0.4s;color:#d71b51;font-weight:900;" id="animArrow3">${hasVowelStart ? '' : '↴'}</div>
 
             <div style="grid-column:1;grid-row:4;"></div>
             <div style="grid-column:2;grid-row:4;"></div>
@@ -683,16 +710,49 @@
             </div>
             <div style="grid-column:6;grid-row:5;"></div>
             <div class="ag-cell" style="grid-column:7;grid-row:5;opacity:0;transition:opacity 0.4s;" id="blockB-cons">
-                <div class="lern-tile cons">${cons?escHtml(consLower)+'e':'e'}</div>
+                <div class="lern-tile cons">${cons?escHtml(consLower)+'<span style="color:#1a2e4a;">e</span>':'<span style="color:#1a2e4a;">e</span>'}</div>
             </div>
         </div>`;
 
         html+=`<div class="lern-result" id="animResult" style="opacity:0;transition:opacity 0.5s;">
             <span class="lern-result-label">Resultat:</span>
-            <span class="lern-result-word">${escHtml(prefix)}${midDisplay?escHtml(midDisplay):''}'${consHtmlResult}${escHtml(punc||'')}</span>
+            <span class="lern-result-word">${escHtml(prefix)}${midDisplay?escHtml(midDisplay):''}'${consHtmlResult}</span>
         </div>`;
 
+        // Build Aussprache hint if applicable
+        (function(){
+            let ausspText = null;
+            const p = escHtml(prefix);
+            const m = midDisplay ? escHtml(midDisplay) : '';
+            const cL = cons ? escHtml(cons.toLowerCase()) : '';
+            if(!cons){
+                // Vokalstart: '(h)e
+                ausspText = p + m + "&#x27;<span style=\"color:#2563a8;\">(h)</span>e";
+            } else if(midDisplay && midDisplay[0].toLowerCase()==='u'){
+                // Rest beginnt mit u: I(e)u....'cLe
+                const mRest = escHtml(midDisplay);
+                ausspText = p + "<span style=\"color:#2563a8;\">(e)</span>" + mRest + "&#x27;" + cL + "e";
+            } else if(midDisplay && midDisplay[0].toLowerCase()==='i'){
+                // Rest beginnt mit i: ersetze erstes i durch (e)
+                const mRest = escHtml(midDisplay.substring(1));
+                ausspText = p + "<span style=\"color:#2563a8;\">(e)</span>" + mRest + "&#x27;" + cL + "e";
+            }
+            if(ausspText){
+                html+=`<div id="animAussprache" style="opacity:0;transition:opacity 0.5s;font-size:0.83rem;color:#374151;line-height:1.5;margin-top:0.4rem;padding:0.4rem 0.75rem;background:rgba(255,255,255,0.7);border-radius:0.5rem;border-left:3px solid #4ade80;">
+                    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:0.3rem;">
+                        <strong style="color:#15803d;flex-shrink:0;" id="ausspLabel">Aussprache:</strong>
+                        <div>
+                            <span style="font-size:1.1rem;">${ausspText}</span>
+                            ${!cons ? '<div style="font-size:0.95rem;color:#2563a8;margin-top:0.15rem;">(h) = gehauchtes h</div>' : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }
+        })();
+
         el.innerHTML=html;
+        // Sync status label with current state
+        updatePlayerBtns();
     }
 
     function runAnimation(token, onDone){
@@ -707,14 +767,14 @@
 
         ['animSpecial','animArrow0','animArrow1','animArrow2','animArrow3',
          'tagB-i','tagB-rest','tagB-cons',
-         'blockB-i','blockB-rest','blockB-cons','animResult'
+         'blockB-i','blockB-rest','blockB-cons','animResult','animAussprache'
         ].forEach(id=>resetEl(id,'0'));
 
         const T=(ms,fn)=>{const t=setTimeout(fn,animDelay(ms));animTimeouts.push(t);};
 
         T(500,()=>{
             if(hasVowelStart)resetEl('animSpecial','1');
-            resetEl('animArrow0','1');
+            if(!hasVowelStart)resetEl('animArrow0','1');
             resetEl('animArrow1','1');
             resetEl('blockB-i','1');
             resetEl('tagB-i','1');
@@ -725,18 +785,155 @@
             resetEl('tagB-rest','1');
         });
         T(2300,()=>{
-            resetEl('animArrow3','1');
+            if(!hasVowelStart)resetEl('animArrow3','1');
             resetEl('blockB-cons','1');
             resetEl('tagB-cons','1');
         });
         T(3200,()=>{
             resetEl('animResult','1');
+            resetEl('animAussprache','1');
             if(onDone) onDone();
+            else updatePlayerBtns();
         });
     }
 
     // Keep player buttons in sync after chkAuto change (no longer needed but harmless)
     // ── End Lernmodus ─────────────────────────────────────────────
+
+
+    // ── Textbibliothek ────────────────────────────────────────────
+    const FAV_KEY = 'matte_favs';
+
+    function favsLoad() {
+        try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch(e) { return []; }
+    }
+
+    function favsSave(favs) {
+        try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(e) {}
+    }
+
+    function favSave() {
+        const raw = inputArea.value.trim();
+        if (!raw) return;
+        const lines = raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+        const favs = favsLoad();
+        const existingTexts = new Set(favs.map(f=>f.text));
+        let added = 0;
+        lines.forEach(line => {
+            if (!existingTexts.has(line)) {
+                favs.push({ title: line.substring(0,40), text: line });
+                existingTexts.add(line);
+                added++;
+            }
+        });
+        favsSave(favs);
+        const btn = event.currentTarget;
+        const orig = btn.innerHTML;
+        btn.innerHTML = added > 0 ? '✓ ' + added + ' gespeichert' : '– Bereits vorhanden';
+        setTimeout(() => btn.innerHTML = orig, 1800);
+    }
+
+    let _favCursorPos = null;
+
+    function favRememberCursor() {
+        const pos = inputArea.selectionStart;
+        _favCursorPos = (typeof pos === 'number' && pos >= 0) ? pos : null;
+    }
+
+    function favInsert(idx) {
+        const favs = favsLoad();
+        if (!favs[idx]) return;
+        const insertText = favs[idx].text;
+        const current = inputArea.value;
+        // Use remembered position, fall back to end of text
+        const pos = (_favCursorPos !== null && _favCursorPos <= current.length)
+            ? _favCursorPos : current.length;
+        const before = current.substring(0, pos);
+        const after  = current.substring(pos);
+        // No separator before – insert exactly at cursor
+        // Add newline after only if next char isn't already a newline
+        const sepAfter = (after.length > 0 && !after.startsWith('\n')) ? '\n' : '';
+        inputArea.value = before + insertText + sepAfter + after;
+        const newPos = before.length + insertText.length;
+        inputArea.setSelectionRange(newPos, newPos);
+        inputArea.focus();
+        _favCursorPos = null;
+        translate();
+        closeModal('modalFavs');
+    }
+
+    function favDelete(idx) {
+        const favs = favsLoad();
+        favs.splice(idx, 1);
+        favsSave(favs);
+        renderFavsModal();
+    }
+
+    function favCopyAll() {
+        const favs = favsLoad();
+        if (!favs.length) return;
+        const text = favs.map(f=>f.text).join('\n');
+        navigator.clipboard.writeText(text);
+        const btn = document.getElementById('btnFavCopy');
+        if (btn) { const orig=btn.innerHTML; btn.innerHTML='✓ Kopiert!'; setTimeout(()=>btn.innerHTML=orig,1800); }
+    }
+
+    function favImport() {
+        const txt = document.getElementById('favImportTxt').value.trim();
+        if (!txt) return;
+        const lines = txt.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+        const favs = favsLoad();
+        const existingTexts = new Set(favs.map(f=>f.text));
+        let added = 0;
+        lines.forEach(line => {
+            if (!existingTexts.has(line)) {
+                favs.push({ title: line.substring(0,40), text: line });
+                existingTexts.add(line);
+                added++;
+            }
+        });
+        favsSave(favs);
+        document.getElementById('favImportWrap').style.display='none';
+        document.getElementById('favImportTxt').value='';
+        document.getElementById('btnFavImportToggle').style.display='';
+        renderFavsModal();
+    }
+
+    function renderFavsModal() {
+        const body = document.getElementById('favsModalBody');
+        if (!body) return;
+        const favs = favsLoad();
+        let html = '';
+        html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.9rem;align-items:center;">';
+        html += '<button id="btnFavCopy" class="btn-tool btn-tool-copy" onclick="favCopyAll()" style="font-size:0.8rem;">📋 Alle kopieren</button>';
+        html += '<button id="btnFavImportToggle" class="btn-tool btn-tool-copy" onclick="document.getElementById(\'favImportWrap\').style.display=\'block\';this.style.display=\'none\'" style="font-size:0.8rem;">⬆ Importieren</button>';
+        html += '</div>';
+        html += '<div id="favImportWrap" style="display:none;margin-bottom:0.9rem;">';
+        html += '<textarea id="favImportTxt" placeholder="Texte einfügen (1 Zeile = 1 Favorit)\u2026" style="width:100%;height:5rem;font-size:0.8rem;border:1.5px solid #bfd4f5;border-radius:0.5rem;padding:0.5rem;resize:none;font-family:inherit;box-sizing:border-box;"></textarea>';
+        html += '<div style="display:flex;gap:0.4rem;margin-top:0.4rem;">';
+        html += '<button class="btn-tool btn-tool-copy" onclick="favImport()" style="font-size:0.8rem;">\u2713 Importieren</button>';
+        html += '<button class="btn-tool" onclick="document.getElementById(\'favImportWrap\').style.display=\'none\';document.getElementById(\'btnFavImportToggle\').style.display=\'\';document.getElementById(\'favImportTxt\').value=\'\'" style="font-size:0.8rem;">Abbrechen</button>';
+        html += '</div></div>';
+        if (!favs.length) {
+            html += '<div style="font-size:0.85rem;color:#94a3b8;text-align:center;padding:1rem 0;">Noch keine Favoriten gespeichert.</div>';
+        } else {
+            html += '<div style="font-size:0.73rem;color:#94a3b8;margin-bottom:0.5rem;">' + favs.length + ' Eintrag' + (favs.length!==1?'e':'') + '</div>';
+            favs.forEach(function(f, i) {
+                html += '<div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid rgba(26,46,74,0.06);">';
+                html += '<div style="flex:1;min-width:0;cursor:pointer;" onclick="favInsert(' + i + ')" title="Einfügen">';
+                html += '<div style="font-size:0.87rem;color:#1a2e4a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(f.title) + '</div>';
+                
+                html += '</div>';
+                html += '<button class="btn-tool btn-tool-copy" onclick="favInsert(' + i + ')" style="font-size:0.75rem;padding:0.2rem 0.6rem;flex-shrink:0;">Einfügen</button>';
+                html += '<button class="btn-tool" onclick="favDelete(' + i + ')" style="font-size:0.75rem;padding:0.2rem 0.6rem;flex-shrink:0;color:#dc2626;border-color:#fca5a5;" onmouseover="this.style.background=\'#fee2e2\'" onmouseout="this.style.background=\'\'">✕</button>';
+                html += '</div>';
+            });
+        }
+        body.innerHTML = html;
+    }
+
+    // ── End Textbibliothek ────────────────────────────────────────
+
 
     function copyToClipboard(){
         const text=outputArea.innerText;
@@ -747,14 +944,5 @@
         setTimeout(()=>btn.innerHTML='📋 Kopieren',2000);
     }
 </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registriert'))
-                    .catch(err => console.log('Service Worker Fehler', err));
-            });
-        }
-    </script>
 </body>
 </html>

@@ -13,7 +13,8 @@ Ein interaktiver Übersetzer für Matteänglisch (Berner Geheimsprache), optimie
 ## 📂 Projektstruktur
 
 - `index.html`: Die Hauptdatei für das Web-Hosting (Kopie der aktuellsten Version). GitHub Pages nutzt diese Datei als Einstiegspunkt.
-- `Matteänglisch-Dolmätscher_v1_5_3.html`: Die versionierte Originaldatei der Anwendung.
+- `Mattenenglisch-Dolmetscher_v1_7_5.html`: Die versionierte Originaldatei der Anwendung.
+- `Matteänglisch-Dolmätscher_v1_5_3.html`: Ältere Version der Anwendung.
 - `manifest.json`: Konfiguration für die App-Installation.
 - `sw.js`: Service Worker für das Offline-Caching.
 - `icon-192.png` & `icon-512.png`: App-Icons.
@@ -21,7 +22,7 @@ Ein interaktiver Übersetzer für Matteänglisch (Berner Geheimsprache), optimie
 ## 🛠 Installation & Hosting
 
 ### GitHub Pages (Empfohlen)
-Da GitHub Pages automatisch HTTPS unterstützt, ist es ideal für diese PWA. Die Datei `index.html` dient dabei als technischer Einstiegspunkt (Kopie von `Matteänglisch-Dolmätscher_v1_5_3.html`).
+Da GitHub Pages automatisch HTTPS unterstützt, ist es ideal für diese PWA. Die Datei `index.html` dient dabei als technischer Einstiegspunkt (Kopie von `Mattenenglisch-Dolmetscher_v1_7_5.html`).
 
 1. Laden Sie Ihren Code in ein GitHub-Repository hoch.
 2. Gehen Sie zu den **Settings** (Einstellungen) Ihres Repositories.
