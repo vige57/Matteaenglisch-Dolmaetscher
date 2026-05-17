@@ -19,7 +19,16 @@ Ein interaktiver Übersetzer für Matteänglisch (Berner Geheimsprache), optimie
 
 ## 🛠 Installation & Hosting
 
-### Web-Server (Hosting)
+### GitHub Pages (Empfohlen)
+Da GitHub Pages automatisch HTTPS unterstützt, ist es ideal für diese PWA:
+
+1. Laden Sie Ihren Code in ein GitHub-Repository hoch.
+2. Gehen Sie zu den **Settings** (Einstellungen) Ihres Repositories.
+3. Wählen Sie im linken Menü **Pages** aus.
+4. Wählen Sie unter "Build and deployment" den Branch `main` (oder `master`) und den Ordner `/ (root)`.
+5. Klicken Sie auf **Save**. Nach wenigen Minuten ist die App unter `https://<ihr-benutzername>.github.io/<repo-name>/` erreichbar.
+
+### Manueller Web-Server
 Um die PWA-Funktionen (Installation und Offline-Modus) zu nutzen, muss die Anwendung über **HTTPS** bereitgestellt werden:
 
 1. Laden Sie alle Dateien in ein Verzeichnis auf Ihrem Webserver hoch.

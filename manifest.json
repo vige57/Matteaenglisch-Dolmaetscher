@@ -2,7 +2,7 @@
   "name": "Matteänglisch-Dolmetscher",
   "short_name": "Dolmetscher",
   "description": "Ein Übersetzer für Matteänglisch (Berner Geheimsprache).",
-  "start_url": "./Matteänglisch-Dolmätscher_v1_5_3.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fdfaf5",
   "theme_color": "#c8193f",

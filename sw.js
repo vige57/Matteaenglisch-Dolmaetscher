@@ -1,6 +1,6 @@
 const CACHE_NAME = 'matte-dolmetscher-v1';
 const ASSETS = [
-  './Matteänglisch-Dolmätscher_v1_5_3.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
