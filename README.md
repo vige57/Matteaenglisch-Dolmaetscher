@@ -2,6 +2,17 @@
 
 Ein interaktiver Übersetzer für Matteänglisch (Berner Geheimsprache), optimiert als Progressive Web App (PWA).
 
+## 📖 Kurzanleitung (Zusammenfassung)
+
+Diese App ist als **Progressive Web App (PWA)** konzipiert. Hier ist das Wichtigste für die Nutzung:
+
+1.  **Hosting**: Die Dateien müssen auf einem Webserver mit **HTTPS** liegen (z. B. GitHub Pages).
+2.  **Installation**:
+    *   **Android/Chrome**: Drei-Punkte-Menü → "App installieren".
+    *   **iOS/Safari**: Teilen-Symbol → "Zum Home-Bildschirm".
+3.  **Offline-Modus**: Einmal geladen, funktioniert die App auch ohne Internetverbindung.
+4.  **Updates**: Änderungen am Code werden aktiv, wenn in der `sw.js` der `CACHE_NAME` aktualisiert wird.
+
 ## 🚀 Funktionen
 
 - **Echtzeit-Übersetzung**: Übersetzt Texte sofort in Matteänglisch.
