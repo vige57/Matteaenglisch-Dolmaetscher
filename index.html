@@ -857,11 +857,12 @@
             ? _favCursorPos : current.length;
         const before = current.substring(0, pos);
         const after  = current.substring(pos);
-        // No separator before – insert exactly at cursor
+        // Add space before if preceding char is not whitespace
+        const sepBefore = (before.length > 0 && !/\s$/.test(before)) ? ' ' : '';
         // Add newline after only if next char isn't already a newline
         const sepAfter = (after.length > 0 && !after.startsWith('\n')) ? '\n' : '';
-        inputArea.value = before + insertText + sepAfter + after;
-        const newPos = before.length + insertText.length;
+        inputArea.value = before + sepBefore + insertText + sepAfter + after;
+        const newPos = before.length + sepBefore.length + insertText.length;
         inputArea.setSelectionRange(newPos, newPos);
         inputArea.focus();
         _favCursorPos = null;

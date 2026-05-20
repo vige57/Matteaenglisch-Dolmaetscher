@@ -164,7 +164,6 @@
                 <div class="modal-section"><h2 style="color:#d71b51;">Konsonanten markieren</h2><p>Zum besseren Verständnis kannst du dir die nach hinten verschobenen Konsonanten anzeigen lassen.</p></div>
                 <div class="modal-section"><h2 style="color:#d71b51;">Kopieren</h2><p>Kopiert den Text des Ausgabefeldes in die Zwischenablage.</p></div>
                 <div class="modal-section"><h2 style="color:#d71b51;">Schrift</h2><p>Wähle die Schriftgrösse nach deinem Bedürfnis.</p></div>
-                <div class="modal-section"><h2 style="color:#d71b51;">App Installation (PWA)</h2><p>Nutze die App wie eine echte App! In <b>Chrome (Android)</b> über das Menü "App installieren" und in <b>Safari (iOS)</b> über das Teilen-Symbol "Zum Home-Bildschirm" hinzufügen. Einmal geladen, funktioniert alles auch komplett ohne Internetverbindung.</p></div>
             </div>
         </div>
     </div>
@@ -851,11 +850,12 @@
             ? _favCursorPos : current.length;
         const before = current.substring(0, pos);
         const after  = current.substring(pos);
-        // No separator before – insert exactly at cursor
+        // Add space before if preceding char is not whitespace
+        const sepBefore = (before.length > 0 && !/\s$/.test(before)) ? ' ' : '';
         // Add newline after only if next char isn't already a newline
         const sepAfter = (after.length > 0 && !after.startsWith('\n')) ? '\n' : '';
-        inputArea.value = before + insertText + sepAfter + after;
-        const newPos = before.length + insertText.length;
+        inputArea.value = before + sepBefore + insertText + sepAfter + after;
+        const newPos = before.length + sepBefore.length + insertText.length;
         inputArea.setSelectionRange(newPos, newPos);
         inputArea.focus();
         _favCursorPos = null;
