@@ -90,3 +90,13 @@ Release‑Hinweis:
 
 - Dokumentiere den `manifest.json`‑Version‑Bump in `CHANGELOG.md` bzw. Release‑Notes, damit Deployments und Cache‑Bumps nachvollziehbar sind.
 - Optional: Eine CI‑Action kann prüfen, ob `manifest.json` und `sw.js` Versionen zusammenpassen.
+
+
+# Vorgehen für neues Feature
+
+1. neuer Banch erstellen (create Branch)
+2. Änderungen machen 
+3. Änderungen stagen
+4. commit erstellenm
+5. Auf github Pull/Merge Request erstellen
+6. Pull annehmen wenn gut.
