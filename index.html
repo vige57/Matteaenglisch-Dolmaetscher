@@ -408,17 +408,30 @@
         outputArea.innerHTML=renderTokens(lastTokens,isShowingBack);
     }
 
-    function transformWord(rawWord,nextSep){
-        const match=rawWord.replace(/'/g,'').match(/^(.*?)([\!\?\,\.\:\;]*)$/);
-        const word=match[1],punctuation=match[2];
-        if(!word)return{token:{type:'plain',value:punctuation},warning:null};
+    function transformWord(rawWord, nextSep) {
+        // 1. Trenne führende und nachfolgende Sonderzeichen/Satzzeichen sauber ab (z.B. "(Hoi!")
+        const match = rawWord.replace(/'/g, '').match(/^([^a-zA-ZäöüÄÖÜ]*)(.*?)([^a-zA-ZäöüÄÖÜ]*)$/);
+        if (!match) return { token: { type: 'plain', value: rawWord }, warning: null };
+
+        const leadPunc = match[1] || "";
+        const word = match[2] || "";
+        const trailPunc = match[3] || "";
+
+        if (!word) return { token: { type: 'plain', value: leadPunc + trailPunc }, warning: null };
+
         if(skipShortBox.checked&&word.length===2&&nextSep!=='-')
-            return{token:{type:'plain',value:word+punctuation},warning:null};
+            return { token: { type: 'plain', value: leadPunc + word + trailPunc }, warning: null };
+
         const hasVowel=[...word].some(c=>VOKALE.includes(c));
-        if(word.length<=1||!hasVowel)return{token:{type:'plain',value:word+punctuation},warning:null};
+        if (word.length <= 1 || !hasVowel) 
+            return { token: { type: 'plain', value: leadPunc + word + trailPunc }, warning: null };
+
         const startsWithUpper=word[0]===word[0].toUpperCase()&&word[0]!==word[0].toLowerCase();
+        const isAllCaps = word.length > 1 && word === word.toUpperCase();
+
         if(word.length===2&&word[0].toLowerCase()===word[1].toLowerCase()&&VOKALE.includes(word[0]))
-            return{token:{type:'plain',value:(startsWithUpper?'Ie':'ie')+punctuation},warning:null};
+            return { token: { type: 'plain', value: leadPunc + (startsWithUpper ? 'Ie' : 'ie') + trailPunc }, warning: null };
+
         let a='',b='',i=0;
         while(i<word.length&&!VOKALE.includes(word[i])){a+=word[i];i++;}
         if(i<word.length){
@@ -432,12 +445,15 @@
             if(VERBOTENE_REST.includes(char)){forbiddenCount++;lastForbidden=char;cleanC+='e';}
             else cleanC+=char;
         }
-        if(forbiddenCount>1)return{token:{type:'plain',value:word+punctuation},warning:`"${word}": Zu viele unerlaubte Selbstlaute: Wort mit "-" trennen.`};
-        const warning=forbiddenCount===1?`"${word}": Vokal "${lastForbidden}" durch "e" ersetzt.`:null;
-        const prefix=startsWithUpper?'I':'i';
+        if (forbiddenCount > 1) return { token: { type: 'plain', value: leadPunc + word + trailPunc }, warning: `"${word}": Zu viele unerlaubte Selbstlaute: Wort mit "-" trennen.` };
+        const warning = forbiddenCount === 1 ? `"${word}": Vokal "${lastForbidden}" durch "e" ersetzt.` : null;
+        
+        // Führende Zeichen an den Prefix hängen, damit renderTokens sie korrekt platziert
+        const prefix = leadPunc + (startsWithUpper ? 'I' : 'i');
+
         // cons stores original case for display in Lernmodus
         return{
-            token:{type:'word',prefix,mid:cleanC,cons:a,vowel:b,punc:punctuation,upper:startsWithUpper},
+            token: { type: 'word', prefix, mid: cleanC, cons: a, vowel: b, punc: trailPunc, upper: startsWithUpper, isAllCaps: isAllCaps },
             warning
         };
     }

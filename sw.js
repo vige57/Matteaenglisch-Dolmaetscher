@@ -7,7 +7,8 @@
 */
 
 const APP_PREFIX = 'matte-dolmetscher-';
-const DEFAULT_VERSION = 'v1';
+// Current App Version: 1.7.7
+const DEFAULT_VERSION = '1.7.7'; 
 const PRECACHE_ASSETS = [
   '/index.html',
   '/manifest.json',
