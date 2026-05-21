@@ -218,7 +218,7 @@
             <div class="input-header">
                 <div class="section-label" style="margin-bottom:0"><span class="dot"></span> Bärndütsch</div>
                 <div class="input-btns">
-                    <button class="btn-clear" onclick="favSave()" title="Als Favorit speichern">★ Speichern</button>
+                    <button class="btn-clear" onclick="favSave(event)" title="Als Favorit speichern">★ Speichern</button>
                     <button class="btn-clear" onclick="favRememberCursor();openModal('modalFavs')" title="Textbibliothek">📚</button>
                     <button class="btn-clear" onclick="clearInput()">✕ Löschen</button>
                 </div>
@@ -262,7 +262,7 @@
                 <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
                     <button class="btn-tool btn-tool-help" onclick="openModal('modalAnleitung')">❓</button>
                     <button class="btn-tool btn-tool-help" onclick="openModal('modalRegeln')">📖 Regeln</button>
-                    <button class="btn-tool btn-tool-copy" onclick="copyToClipboard()">📋 Kopieren</button>
+                    <button class="btn-tool btn-tool-copy" onclick="copyToClipboard(event)">📋 Kopieren</button>
                 </div>
                 <div class="fontsize-row" style="margin-bottom:0">
                     <span class="fontsize-label">Schrift</span>
@@ -279,7 +279,8 @@
                 <a href="https://www.matteaenglisch.ch/" target="_blank" rel="noopener" style="text-decoration:none;" class="contact-badge-wrap">
                     <div class="badge" style="margin:0;">🐻 Matteänglisch-Club Bärn</div>
                 </a>
-                <div class="contact-links">
+                <div class="contact-links" style="align-items: center;">
+                    <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 0.5rem; font-weight: 600;">v1.7.7</span>
                     <a href="https://www.matteaenglisch.ch" target="_blank" rel="noopener" class="contact-link">Web</a>
                     <a href="mailto:ittume@matteaenglisch.ch" class="contact-link">Mail</a>
                     <a href="https://matteaenglisch.ch/kontakt" target="_blank" rel="noopener" class="contact-link">Kontakt</a>
@@ -295,7 +296,7 @@
     const warningsArea= document.getElementById('warnings');
     const skipShortBox= document.getElementById('skipShort');
     const markConsBox = document.getElementById('markConsonants');
-    const VOKALE      = "aeiouäöüäyAEIOUÄÖÜY";
+    const VOKALE      = "aeiouäöüyAEIOUÄÖÜY";
     const VERBOTENE_REST = "aoäöüAOÄÖÜ";
 
     window.onload = () => inputArea.focus();
@@ -376,19 +377,20 @@
         return tokens.map((t,idx)=>{
             if(t.type==='sep')return t.value;
             let inner='';
+            const lead = t.leadPunc || '';
             if(t.type==='plain'){
                 inner=escHtml(t.value);
             } else if(!back){
                 const consHtml=markConsBox.checked&&t.cons
                     ?`<span style="color:#d71b51;">${escHtml(t.cons.toLowerCase())}</span>`
                     :escHtml(t.cons.toLowerCase());
-                inner=escHtml(t.prefix)+escHtml(t.mid)+"'"+consHtml+'e'+escHtml(t.punc);
+                inner=lead + escHtml(t.prefix)+escHtml(t.mid)+"'"+consHtml+'e'+escHtml(t.punc);
             } else {
                 if(!t.cons){
-                    inner=`<span style="color:#d71b51;">${escHtml(t.prefix)}</span>`+escHtml(t.mid)+escHtml(t.punc);
+                    inner=lead + `<span style="color:#d71b51;">${escHtml(t.prefix)}</span>`+escHtml(t.mid)+escHtml(t.punc);
                 } else {
                     const firstChar=t.upper?t.cons[0].toUpperCase()+t.cons.slice(1).toLowerCase():t.cons.toLowerCase();
-                    inner=escHtml(firstChar)+`<span style="color:#d71b51;">i</span>`+escHtml(t.mid)+escHtml(t.punc);
+                    inner=lead + escHtml(firstChar)+`<span style="color:#d71b51;">i</span>`+escHtml(t.mid)+escHtml(t.punc);
                 }
             }
             if(lernmodusActive&&t.type!=='sep'){
@@ -448,12 +450,11 @@
         if (forbiddenCount > 1) return { token: { type: 'plain', value: leadPunc + word + trailPunc }, warning: `"${word}": Zu viele unerlaubte Selbstlaute: Wort mit "-" trennen.` };
         const warning = forbiddenCount === 1 ? `"${word}": Vokal "${lastForbidden}" durch "e" ersetzt.` : null;
         
-        // Führende Zeichen an den Prefix hängen, damit renderTokens sie korrekt platziert
-        const prefix = leadPunc + (startsWithUpper ? 'I' : 'i');
+        const prefix = (startsWithUpper ? 'I' : 'i');
 
         // cons stores original case for display in Lernmodus
         return{
-            token: { type: 'word', prefix, mid: cleanC, cons: a, vowel: b, punc: trailPunc, upper: startsWithUpper, isAllCaps: isAllCaps },
+            token: { type: 'word', leadPunc, prefix, mid: cleanC, cons: a, vowel: b, punc: trailPunc, upper: startsWithUpper, isAllCaps: isAllCaps },
             warning
         };
     }
@@ -835,7 +836,7 @@
         try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch(e) {}
     }
 
-    function favSave() {
+    function favSave(event) {
         const raw = inputArea.value.trim();
         if (!raw) return;
         const lines = raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
@@ -959,7 +960,7 @@
     // ── End Textbibliothek ────────────────────────────────────────
 
 
-    function copyToClipboard(){
+    function copyToClipboard(event){
         const text=outputArea.innerText;
         if(!text)return;
         navigator.clipboard.writeText(text);
