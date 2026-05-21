@@ -1,0 +1,48 @@
+name: Auto Version Bump
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!README.md'
+      - '!.github/**'
+
+jobs:
+  bump-version:
+    # Verhindert, dass der Workflow läuft, wenn der Commit bereits ein automatischer Bump war
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump version in manifest.json
+        id: bump
+        run: |
+          # Aktuelle Version auslesen
+          OLD_VERSION=$(jq -r '.version' manifest.json)
+          echo "Old version: $OLD_VERSION"
+          
+          # Version erhöhen (Patch-Level: 1.7.8 -> 1.7.9)
+          # Nutzt awk um den letzten Teil des Punkt-getrennten Strings zu erhöhen
+          NEW_VERSION=$(echo $OLD_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "New version: $NEW_VERSION"
+          
+          # Zurückschreiben in manifest.json
+          jq ".version = \"$NEW_VERSION\"" manifest.json > temp.json && mv temp.json manifest.json
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add manifest.json
+          git commit -m "chore: auto-bump version to ${{ steps.bump.outputs.new_version }} [skip ci]"
+          git push
