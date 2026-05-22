@@ -279,7 +279,8 @@
                 <a href="https://www.matteaenglisch.ch/" target="_blank" rel="noopener" style="text-decoration:none;" class="contact-badge-wrap">
                     <div class="badge" style="margin:0;">🐻 Matteänglisch-Club Bärn</div>
                 </a>
-                <div class="contact-links">
+                <div class="contact-links" style="align-items: center;">
+                    <span id="app-version" style="font-size: 0.7rem; color: var(--text-muted); margin-left: 0.5rem; font-weight: 600;">...</span>
                     <a href="https://www.matteaenglisch.ch" target="_blank" rel="noopener" class="contact-link">Web</a>
                     <a href="mailto:ittume@matteaenglisch.ch" class="contact-link">Mail</a>
                     <a href="https://matteaenglisch.ch/kontakt" target="_blank" rel="noopener" class="contact-link">Kontakt</a>
@@ -298,7 +299,25 @@
     const VOKALE      = "aeiouäöüäyAEIOUÄÖÜY";
     const VERBOTENE_REST = "aoäöüAOÄÖÜ";
 
-    window.onload = () => inputArea.focus();
+    window.onload = () => {
+        inputArea.focus();
+        loadVersion();
+    };
+
+    async function loadVersion() {
+        // 1. Lausche auf Nachrichten vom Service Worker
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && (event.data.type === 'VERSION_INFO' || event.data.type === 'SW_ACTIVATED')) {
+                document.getElementById('app-version').textContent = 'v' + event.data.version;
+            }
+        });
+
+        // 2. Sobald der SW bereit ist, frage die Version ab
+        const reg = await navigator.serviceWorker.ready;
+        if (reg.active) {
+            reg.active.postMessage({ action: 'GET_VERSION' });
+        }
+    }
     inputArea.addEventListener('input', translate);
     skipShortBox.addEventListener('change', translate);
     markConsBox.addEventListener('change', () => {
@@ -774,6 +793,7 @@
 
         ['animSpecial','animArrow0','animArrow1','animArrow2','animArrow3',
          'tagB-i','tagB-rest','tagB-cons',
+         'blockB-i','blockB-rest','tagB-cons',
          'blockB-i','blockB-rest','blockB-cons','animResult','animAussprache'
         ].forEach(id=>resetEl(id,'0'));
 
@@ -955,9 +975,11 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
-                try{
+                                try{
+                    const manifestRes = await fetch('manifest.json');
+                    const manifestData = await manifestRes.json();
+                    const version = manifestData.version || '1.0.0';
                     const reg = await navigator.serviceWorker.register('./sw.js');
-                    console.log('Service Worker registriert', reg);
 
                     function createUpdateBanner(reg){
                         if(document.getElementById('swUpdateBanner')) return;
@@ -1013,3 +1035,4 @@
     </script>
 </body>
 </html>
+

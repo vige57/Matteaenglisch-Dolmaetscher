@@ -1,0 +1,52 @@
+name: Auto Version Bump
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**'
+      - '!README.md'
+      - '!.github/**'
+
+jobs:
+  bump-version:
+    # Verhindert, dass der Workflow läuft, wenn der Commit bereits ein automatischer Bump war
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump version based on sw.js
+        id: bump
+        run: |
+          # Extrahiert die Version aus der Zeile: const DEFAULT_VERSION = 'x.y.z';
+          OLD_VERSION=$(grep "const DEFAULT_VERSION =" sw.js | sed -E "s/.*'(.+)'.*/\1/")
+          echo "Old version from sw.js: $OLD_VERSION"
+          
+          # Version erhöhen
+          NEW_VERSION=$(echo $OLD_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "New version: $NEW_VERSION"
+          
+          # 1. Zurückschreiben in sw.js
+          sed -i "s/const DEFAULT_VERSION = '$OLD_VERSION'/const DEFAULT_VERSION = '$NEW_VERSION'/" sw.js
+          
+          # 2. Synchronisieren in manifest.json
+          jq ".version = \"$NEW_VERSION\"" manifest.json > temp.json && mv temp.json manifest.json
+
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add manifest.json sw.js
+          git commit -m "chore: auto-bump version to ${{ steps.bump.outputs.new_version }} [skip ci]"
+          git push
+
