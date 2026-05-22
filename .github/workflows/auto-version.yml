@@ -26,8 +26,8 @@ jobs:
       - name: Bump version based on sw.js
         id: bump
         run: |
-          # Extrahiert die Version aus der Zeile: const DEFAULT_VERSION = 'x.y.z';
-          OLD_VERSION=$(grep "const DEFAULT_VERSION =" sw.js | sed -E "s/.*'(.+)'.*/\1/")
+          # Extrahiert die Version aus der Zeile: const VERSION = 'x.y.z';
+          OLD_VERSION=$(grep "const VERSION =" sw.js | sed -E "s/.*'(.+)'.*/\1/")
           echo "Old version from sw.js: $OLD_VERSION"
           
           # Version erhöhen
@@ -35,7 +35,7 @@ jobs:
           echo "New version: $NEW_VERSION"
           
           # 1. Zurückschreiben in sw.js
-          sed -i "s/const DEFAULT_VERSION = '$OLD_VERSION'/const DEFAULT_VERSION = '$NEW_VERSION'/" sw.js
+          sed -i "s/const VERSION = '$OLD_VERSION'/const VERSION = '$NEW_VERSION'/" sw.js
           
           # 2. Synchronisieren in manifest.json
           jq ".version = \"$NEW_VERSION\"" manifest.json > temp.json && mv temp.json manifest.json
