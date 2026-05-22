@@ -5,7 +5,7 @@
 */
 
 const APP_PREFIX = 'matte-dolmetscher-';
-const DEFAULT_VERSION = '1.7.8'; 
+const VERSION = '1.7.12'; 
 const PRECACHE_ASSETS = [
   './index.html',
   './manifest.json',
@@ -16,9 +16,6 @@ const PRECACHE_ASSETS = [
 
 const RUNTIME_CACHE = 'runtime-cache';
 
-// Get version from URL param (sw.js?v=...) or fallback
-const urlParams = new URLSearchParams(self.location.search);
-const VERSION = urlParams.get('v') || DEFAULT_VERSION;
 const CACHE_NAME = APP_PREFIX + VERSION;
 
 self.addEventListener('install', (event)=>{
@@ -52,9 +49,18 @@ self.addEventListener('activate', (event)=>{
   })());
 });
 
-self.addEventListener('message', (event)=>{
-  if(!event.data) return;
-  if(event.data.action === 'skipWaiting'){
+// NEU: Message Listener für Versions-Abfrage
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+
+  if (event.data.action === 'GET_VERSION') {
+    event.source.postMessage({
+      type: 'VERSION_INFO',
+      version: VERSION
+    });
+  }
+
+  if (event.data.action === 'skipWaiting') {
     self.skipWaiting();
   }
 });
@@ -93,6 +99,7 @@ self.addEventListener('fetch', (event)=>{
     event.respondWith((async ()=>{
       const cache = await caches.open(CACHE_NAME);
       const cached = await cache.match(req);
+      console.log(req.destination, req.url, 'Cache hit:', !!cached);
       const networkPromise = fetch(req).then(res=>{ 
           if(res.ok) cache.put(req,res.clone()).catch(()=>{}); 
           return res; 
@@ -109,4 +116,5 @@ self.addEventListener('fetch', (event)=>{
     try{ return await fetch(req); }catch(e){ return Response.error(); }
   })());
 });
+
 

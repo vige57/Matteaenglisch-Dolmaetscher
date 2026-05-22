@@ -30,25 +30,33 @@ Diese App ist als **Progressive Web App (PWA)** konzipiert. Hier ist das Wichtig
 - `sw.js`: Service Worker für das Offline-Caching.
 - `icon-192.png` & `icon-512.png`: App-Icons.
 
-## 🛠 Installation & Hosting
+---
 
-### GitHub Pages (Empfohlen)
-Da GitHub Pages automatisch HTTPS unterstützt, ist es ideal für diese PWA. Die Datei `index.html` dient dabei als technischer Einstiegspunkt (Kopie von `Mattenenglisch-Dolmetscher_v1_7_5.html`).
+## 🛠 Release- & Versionsmanagement
 
-1. Laden Sie Ihren Code in ein GitHub-Repository hoch.
-2. Gehen Sie zu den **Settings** (Einstellungen) Ihres Repositories.
-3. Wählen Sie im linken Menü **Pages** aus.
-4. Wählen Sie unter "Build and deployment" den Branch `main` (oder `master`) und den Ordner `/ (root)`.
-5. Klicken Sie auf **Save**. Nach wenigen Minuten ist die App unter `https://<ihr-benutzername>.github.io/<repo-name>/` erreichbar.
+Dieses Projekt nutzt einen automatisierten Release-Prozess. Die **Versionsnummer wird zentral gesteuert** und automatisch bei jedem Update erhöht.
 
-### Manueller Web-Server
-Um die PWA-Funktionen (Installation und Offline-Modus) zu nutzen, muss die Anwendung über **HTTPS** bereitgestellt werden:
+### 1. Die "Source of Truth"
+Die primäre Quelle für die Versionsnummer ist die Datei `sw.js`.
+- Die Variable `const DEFAULT_VERSION` im Service Worker definiert den aktuellen Stand der App.
+- Der Footer in der App bezieht seine Informationen direkt vom aktiven Service Worker per Messaging (`GET_VERSION`), nicht aus dem statischen HTML.
 
-1. Laden Sie alle Dateien in ein Verzeichnis auf Ihrem Webserver hoch.
-2. Stellen Sie sicher, dass die Seite über eine verschlüsselte Verbindung (https://...) erreichbar ist.
+### 2. Automatisierter Update-Workflow (GitHub Actions)
+Sobald Änderungen in den `main`-Branch gemergt werden (z. B. durch einen Pull Request), startet der Workflow **"Auto Version Bump"**:
 
-### Lokale Nutzung
-Sie können die `.html` Datei auch einfach lokal in einem Browser öffnen. In diesem Fall funktionieren jedoch die Service Worker und die Installation als App (PWA) meist nicht.
+1. **Extraktion:** Er liest die aktuelle Version aus der `sw.js`.
+2. **Inkrement:** Er erhöht die Patch-Version (z. B. `1.7.10` → `1.7.11`).
+3. **Synchronisation:** Er schreibt die neue Version zurück in die `sw.js` **und** in die `manifest.json`.
+4. **Commit:** Er erstellt einen automatischen Commit mit dem Tag `[skip ci]`, um Endlosschleifen zu verhindern.
+
+### 3. Client-seitiges Update-Verhalten
+Durch die physische Änderung in der `sw.js` erkennt der Browser des Nutzers sofort, dass eine neue Version vorliegt:
+
+- **Hintergrund-Installation:** Der neue Service Worker wird im Hintergrund installiert.
+- **Update-Banner:** Sobald der neue Worker bereitsteht, erscheint in der App ein Banner ("Neue Version verfügbar").
+- **Aktivierung:** Beim Klick auf "Jetzt neu laden" übernimmt der neue Worker die Kontrolle, löscht den alten Cache und aktualisiert die Anzeige im Footer sofort per Live-Event (`SW_ACTIVATED`).
+
+---
 
 ## 📱 Als App installieren
 
@@ -78,25 +86,4 @@ Testing (lokal):
 
 1. Starte einen lokalen HTTP‑Server im Projektverzeichnis (SW funktioniert auf `localhost` ohne HTTPS):
 
-```bash
-npx http-server . -p 8080
-```
 
-2. Öffne `http://localhost:8080` in Chrome. DevTools → Application → Service Workers prüfen.
-3. Update‑Flow testen: Erhöhe `manifest.json:version`, lade die Seite neu — es sollte ein Update‑Banner erscheinen; wähle "Jetzt neu laden", der neue SW wird aktiv und die Seite aktualisiert.
-4. Offline testen: Seite laden, dann DevTools → Network → Offline, navigiere → `offline.html` wird gezeigt.
-
-Release‑Hinweis:
-
-- Dokumentiere den `manifest.json`‑Version‑Bump in `CHANGELOG.md` bzw. Release‑Notes, damit Deployments und Cache‑Bumps nachvollziehbar sind.
-- Optional: Eine CI‑Action kann prüfen, ob `manifest.json` und `sw.js` Versionen zusammenpassen.
-
-
-# Vorgehen für neues Feature
-
-1. neuer Banch erstellen (create Branch)
-2. Änderungen machen 
-3. Änderungen stagen
-4. commit erstellenm
-5. Auf github Pull/Merge Request erstellen
-6. Pull annehmen wenn gut.
