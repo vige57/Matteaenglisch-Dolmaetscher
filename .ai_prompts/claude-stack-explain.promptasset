@@ -1,0 +1,14 @@
+Hallo Claude, wir ändern ab sofort unseren Arbeits-Workflow für den Matteänglisch-Dolmetscher. 
+
+Bitte vergiss die bisherigen, manuell versionierten Dateien (wie z.B. Mattenenglisch-Dolmetscher_v1_7_6.html). Ich habe dir als Anhang unsere neue Basis-Datei hochgeladen: die index.html. 
+
+Diese index.html bildet das Frontend für unsere neue Progressive Web App (PWA). Sie arbeitet im Hintergrund mit einem Service Worker (sw.js) und einem Manifest, welche über automatisierte Pipelines (GitHub Actions) versioniert werden. Du musst diese externen Dateien nicht kennen, aber du musst zwingend folgende Regeln für alle zukünftigen Anpassungen beachten:
+
+1. Basis: Ab sofort nutzen wir *immer* dieses neue HTML-Gerüst (index.html) für Erweiterungen. Wir benennen die Datei nicht mehr um (keine Versionsnummern mehr im Dateinamen).
+2. Header-Metadaten: Verändere niemals die Apple-Meta-Tags und den <link rel="manifest" href="manifest.json"> im <head>.
+3. Service Worker Skript: Ganz am Ende der Datei befindet sich ein <script>, das ./sw.js registriert und die Funktion createUpdateBanner enthält. Dieses Skript ist essenziell für die Offline-Fähigkeit und Updates. Nicht verändern oder löschen.
+4. Dynamische Versionierung: Im Footer gibt es ein <span id="app-version"> und im JavaScript die Methode loadVersion(). Diese kommunizieren mit dem Service Worker, um die aktuelle App-Version anzuzeigen. Nicht verändern. Bitte schreibe auch keine hardcodierten Versionsnummern mehr in den Code.
+
+Du kannst alle neuen Features, Styles und Matteänglisch-Logiken wie gewohnt implementieren, aber bitte bette sie ab jetzt behutsam in diese neue index.html ein, ohne die oben genannten PWA-Strukturen zu beschädigen. 
+
+Bitte bestätige mir kurz, dass du die neuen Spielregeln und das PWA-Setup verstanden hast. Danach nenne ich dir direkt das nächste Feature, das wir einbauen wollen!
