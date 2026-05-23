@@ -2,6 +2,12 @@
 
 Hallo! Dieser Ordner (`.ai_prompts`) ist ein spezieller "Tresor" für alle Projekt-Prompts und KI-Anweisungen. 
 
+## Wichtige Promts und ihren Verwendungszweck
+
+1. [claude-stack-explain](claude-stack-explain.promptasset) <- dient der Überführung des aktuellen Chat / Stacks mit Claude auf die neue [index.html](../src/index.html)
+2. [init-new-chat](init-new-chat.promtasset) <- Dient als Initlaisierungspromt mit beliebigem einem AI Chat. Voraussetzung ist jeweils die Übergabe der [index.html](../src/index.html)
+
+# 🤔 Warum dieser Ordner?
 Hier ist kurz und knapp erklärt, warum dieser Ordner existiert und wie du ihn optimal nutzt, ohne deine KI-Ressourcen zu verschwenden.
 
 ---
