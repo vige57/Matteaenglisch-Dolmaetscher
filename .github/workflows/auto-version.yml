@@ -8,7 +8,12 @@ on:
       - '**'
       - '!README.md'
       - '!.github/**'
-
+      - '!.gitignore'
+      - '!.aiignore'
+      - '!.cursorignore'
+      - '!.aiderignore'
+      - '!.copilotignore'
+      - '!.ai_prompts/**'
 jobs:
   bump-version:
     # Verhindert, dass der Workflow läuft, wenn der Commit bereits ein automatischer Bump war
