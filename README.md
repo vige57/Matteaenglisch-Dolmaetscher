@@ -2,88 +2,63 @@
 
 Ein interaktiver Übersetzer für Matteänglisch (Berner Geheimsprache), optimiert als Progressive Web App (PWA).
 
-## 📖 Kurzanleitung (Zusammenfassung)
+---
 
-Diese App ist als **Progressive Web App (PWA)** konzipiert. Hier ist das Wichtigste für die Nutzung:
+## 📂 Die neue Projektstruktur (Wichtig für Entwickler & KI)
 
-1.  **Hosting**: Die Dateien müssen auf einem Webserver mit **HTTPS** liegen (z. B. GitHub Pages).
-2.  **Installation**:
-    *   **Android/Chrome**: Drei-Punkte-Menü → "App installieren".
-    *   **iOS/Safari**: Teilen-Symbol → "Zum Home-Bildschirm".
-3.  **Offline-Modus**: Einmal geladen, funktioniert die App auch ohne Internetverbindung.
-4.  **Updates**: Änderungen am Code werden aktiv, wenn in der `sw.js` der `CACHE_NAME` aktualisiert wird.
+Um das Projekt übersichtlich zu halten und die Zusammenarbeit mit KI-Assistenten (wie Claude) zu optimieren, ist das Repository strikt in verschiedene Bereiche unterteilt:
 
-## 🚀 Funktionen
-
-- **Echtzeit-Übersetzung**: Übersetzt Texte sofort in Matteänglisch.
-- **Lernmodus**: Interaktive Visualisierung der Wortbildung (Konsonanten-Vokal-Trennung).
-- **Vorlesefunktion**: Integrierte Sprachausgabe für die übersetzten Begriffe.
-- **PWA-Unterstützung**: Kann als App auf dem Smartphone oder Desktop installiert werden.
-- **Offline-Modus**: Funktioniert dank Service Worker auch ohne aktive Internetverbindung.
-
-## 📂 Projektstruktur
-
-- `index.html`: Die Hauptdatei für das Web-Hosting (Kopie der aktuellsten Version). GitHub Pages nutzt diese Datei als Einstiegspunkt.
-- `Mattenenglisch-Dolmetscher_v1_7_5.html`: Die versionierte Originaldatei der Anwendung.
-- `Matteänglisch-Dolmätscher_v1_5_3.html`: Ältere Version der Anwendung.
-- `manifest.json`: Konfiguration für die App-Installation.
-- `sw.js`: Service Worker für das Offline-Caching.
-- `icon-192.png` & `icon-512.png`: App-Icons.
+```text
+/
+├── .ai_prompts/       # 🤖 KI-Tresor: Hier liegen alle Prompts (.promptasset). 
+│                      # Dieser Ordner wird von KIs im Code-Editor ignoriert, um Tokens zu sparen.
+├── .github/workflows/ # ⚙️ Pipelines: Automatisches Deployment und Versionierung.
+├── src/               # 🚀 HIER LEBT DIE APP: Der einzige Ordner für den eigentlichen Code!
+│   ├── index.html     # -> Die Haupt-Arbeitsdatei (Bitte nur noch diese bearbeiten!)
+│   ├── sw.js          # -> Service Worker (steuert Offline-Modus & Version)
+│   ├── manifest.json  # -> App-Metadaten
+│   └── icon-*.png     # -> App-Logos
+├── .*ignore           # 🛡️ Diverse Ignore-Dateien (Git, Copilot, Cursor etc.)
+└── README.md          # 📖 Diese Dokumentation
+```
 
 ---
 
-## 🛠 Release- & Versionsmanagement
+## 👨‍💻 Workflow für die Entwicklung (mit Claude & Co.)
 
-Dieses Projekt nutzt einen automatisierten Release-Prozess. Die **Versionsnummer wird zentral gesteuert** und automatisch bei jedem Update erhöht.
+Wir nutzen keine manuell versionierten Dateien (`Mattenenglisch_v1_x_x.html`) mehr. 
 
-### 1. Die "Source of Truth"
-Die primäre Quelle für die Versionsnummer ist die Datei `sw.js`.
-- Die Variable `const DEFAULT_VERSION` im Service Worker definiert den aktuellen Stand der App.
-- Der Footer in der App bezieht seine Informationen direkt vom aktiven Service Worker per Messaging (`GET_VERSION`), nicht aus dem statischen HTML.
-
-### 2. Automatisierter Update-Workflow (GitHub Actions)
-Sobald Änderungen in den `main`-Branch gemergt werden (z. B. durch einen Pull Request), startet der Workflow **"Auto Version Bump"**:
-
-1. **Extraktion:** Er liest die aktuelle Version aus der `sw.js`.
-2. **Inkrement:** Er erhöht die Patch-Version (z. B. `1.7.10` → `1.7.11`).
-3. **Synchronisation:** Er schreibt die neue Version zurück in die `sw.js` **und** in die `manifest.json`.
-4. **Commit:** Er erstellt einen automatischen Commit mit dem Tag `[skip ci]`, um Endlosschleifen zu verhindern.
-
-### 3. Client-seitiges Update-Verhalten
-Durch die physische Änderung in der `sw.js` erkennt der Browser des Nutzers sofort, dass eine neue Version vorliegt:
-
-- **Hintergrund-Installation:** Der neue Service Worker wird im Hintergrund installiert.
-- **Update-Banner:** Sobald der neue Worker bereitsteht, erscheint in der App ein Banner ("Neue Version verfügbar").
-- **Aktivierung:** Beim Klick auf "Jetzt neu laden" übernimmt der neue Worker die Kontrolle, löscht den alten Cache und aktualisiert die Anzeige im Footer sofort per Live-Event (`SW_ACTIVATED`).
+**So arbeitest du an neuen Features:**
+1. Lade **ausschließlich** die Datei `src/index.html` in deinen KI-Chat hoch.
+2. Lass die KI die Anpassungen vornehmen.
+3. Speichere die Änderungen wieder in exakt derselben Datei (`src/index.html`) ab.
+4. Fertig! Sobald du die Datei auf GitHub pushst, übernimmt das System den Rest.
 
 ---
 
-## 📱 Als App installieren
+## 🚀 Release- & Deployment-Automatisierung
 
-### Android (Chrome)
-- Öffnen Sie die Website in Chrome.
-- Tippen Sie auf das Drei-Punkte-Menü.
-- Wählen Sie **"App installieren"** oder **"Zum Startbildschirm hinzufügen"**.
+Dieses Projekt arbeitet mit vollautomatisierten GitHub Actions. Sobald eine Änderung am Code im Ordner `src/` auf den `main`-Branch gepusht wird, passieren zwei Dinge:
 
-### iOS / iPhone (Safari)
-- Öffnen Sie die Website in Safari.
-- Tippen Sie auf das **Teilen-Symbol** (Viereck mit Pfeil nach oben).
-- Scrollen Sie nach unten und wählen Sie **"Zum Home-Bildschirm"**.
+### 1. Auto Version Bump
+Das System liest die alte Version aus der `src/sw.js` aus, erhöht die Patch-Version (z. B. `1.7.8` → `1.7.9`) und schreibt diese neue Version automatisch in die `sw.js` und `manifest.json`.
+
+### 2. Auto Deployment (GitHub Pages)
+Anschließend greift sich GitHub Pages **nur** den Ordner `src/` und veröffentlicht ihn als Live-Website. Dadurch sind deine Prompts und Infrastruktur-Dateien niemals öffentlich im Web sichtbar.
+
+> **Wichtig:** Eine Änderung, die *außerhalb* des `src/`-Ordners passiert (z. B. wenn du einen neuen Prompt im `.ai_prompts`-Ordner anlegst), löst diese Aktionen **nicht** aus. Die Live-Website und die Versionsnummer bleiben in diesem Fall unberührt.
+
+---
+
+## 📱 App Installation (PWA-Nutzung)
+
+Diese Web-App lässt sich wie eine echte, native App auf Endgeräten installieren und funktioniert dank des Service Workers (`sw.js`) auch offline.
+
+* **Android (Chrome)**: Öffne die Website → tippe auf das Drei-Punkte-Menü → wähle **"App installieren"** oder **"Zum Startbildschirm hinzufügen"**.
+* **iOS / iPhone (Safari)**: Öffne die Website → tippe auf das **Teilen-Symbol** (Viereck mit Pfeil nach oben) → wähle **"Zum Home-Bildschirm"**.
+
+### Updates beim Nutzer
+Wenn im Hintergrund durch GitHub eine neue Version veröffentlicht wurde, lädt die App auf dem Handy das Update beim nächsten Start automatisch herunter. Im Footer der App ist stets die aktuell geladene Version ersichtlich.
 
 ---
 *Erstellt für die Matteänglisch-Community.*
-
-## Cache & Update‑Handhabung
-
-Dieses Projekt nutzt einen Service Worker (`sw.js`) zur Offline‑Fähigkeit. Kurz zusammengefasst:
-
-- **Versionierung:** Die SW liest die App‑Version aus dem Feld `version` in `manifest.json`. Erhöhe diese Version (z. B. `1.7.5` → `1.7.6`) bei einem Release, damit der neue Service Worker eine neue Cache‑Bezeichnung verwendet.
-- **Was passiert bei einem Version‑Bump:** Beim nächsten Laden installiert der Browser den neuen SW, `skipWaiting()` sorgt für schnellen Wechsel; beim `activate` werden alte Caches gelöscht.
-- **Offline‑Fallback:** Eine einfache `offline.html` wird precached; wenn eine Navigation fehlschlägt (offline), liefert der SW diese Seite.
-- **Manuelles Leeren (Entwickler):** DevTools → Application → Service Workers → `Unregister` und unter `Clear storage` die Caches löschen.
-
-Testing (lokal):
-
-1. Starte einen lokalen HTTP‑Server im Projektverzeichnis (SW funktioniert auf `localhost` ohne HTTPS):
-
-
