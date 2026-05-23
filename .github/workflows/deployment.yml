@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - 'src/**' #Startet nur, wenn im src-Ordner echter App-Code geändert wird welcher einem deployment unterzogen werden soll.
+  workflow_dispatch:
 
 permissions:
   contents: read
