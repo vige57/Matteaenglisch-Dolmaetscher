@@ -1,11 +1,12 @@
 name: Deploy PWA to GitHub Pages
 
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - 'src/**' #Startet nur, wenn im src-Ordner echter App-Code geändert wird welcher einem deployment unterzogen werden soll.
-  workflow_dispatch:
+  # Orchestrierung: Hört auf den Abschluss der Auto-Version-Action
+  workflow_run:
+    workflows: ["Auto Version Bump"]
+    types:
+      - completed
+  workflow_dispatch: 
 
 permissions:
   contents: read
@@ -18,6 +19,9 @@ concurrency:
 
 jobs:
   deploy:
+    # Sicherheitscheck: Führt das Deployment nur aus, wenn der vorherige Workflow erfolgreich war 
+    # (oder wenn es manuell per Button gestartet wurde)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
