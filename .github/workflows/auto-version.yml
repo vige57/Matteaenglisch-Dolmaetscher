@@ -5,15 +5,8 @@ on:
     branches:
       - main
     paths:
-      - '**'
-      - '!README.md'
-      - '!.github/**'
-      - '!.gitignore'
-      - '!.aiignore'
-      - '!.cursorignore'
-      - '!.aiderignore'
-      - '!.copilotignore'
-      - '!.ai_prompts/**'
+      - 'src/**' #Startet nur, wenn im src-Ordner echter App-Code geändert wird
+
 jobs:
   bump-version:
     # Verhindert, dass der Workflow läuft, wenn der Commit bereits ein automatischer Bump war
@@ -28,22 +21,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Bump version based on sw.js
+      - name: Bump version based on src/sw.js
         id: bump
         run: |
-          # Extrahiert die Version aus der Zeile: const VERSION = 'x.y.z';
-          OLD_VERSION=$(grep "const VERSION =" sw.js | sed -E "s/.*'(.+)'.*/\1/")
-          echo "Old version from sw.js: $OLD_VERSION"
+          # Extrahiert die Version aus der Zeile: const VERSION = 'x.y.z'; aus src/sw.js
+          OLD_VERSION=$(grep "const VERSION =" src/sw.js | sed -E "s/.*'(.+)'.*/\1/")
+          echo "Old version from src/sw.js: $OLD_VERSION"
           
           # Version erhöhen
           NEW_VERSION=$(echo $OLD_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           echo "New version: $NEW_VERSION"
           
-          # 1. Zurückschreiben in sw.js
-          sed -i "s/const VERSION = '$OLD_VERSION'/const VERSION = '$NEW_VERSION'/" sw.js
+          # 1. Zurückschreiben in src/sw.js
+          sed -i "s/const VERSION = '$OLD_VERSION'/const VERSION = '$NEW_VERSION'/" src/sw.js
           
-          # 2. Synchronisieren in manifest.json
-          jq ".version = \"$NEW_VERSION\"" manifest.json > temp.json && mv temp.json manifest.json
+          # 2. Synchronisieren in src/manifest.json
+          jq ".version = \"$NEW_VERSION\"" src/manifest.json > temp.json && mv temp.json src/manifest.json
 
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
@@ -51,7 +44,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add manifest.json sw.js
+          git add src/manifest.json src/sw.js
           git commit -m "chore: auto-bump version to ${{ steps.bump.outputs.new_version }} [skip ci]"
           git push
-
