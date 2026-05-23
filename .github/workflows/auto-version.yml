@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'src/**' #Startet nur, wenn im src-Ordner echter App-Code geändert wird
+  workflow_dispatch:
 
 jobs:
   bump-version:
