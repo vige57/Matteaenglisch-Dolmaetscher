@@ -305,14 +305,17 @@
     };
 
     async function loadVersion() {
-        try {
-            const res = await fetch('manifest.json');
-            const data = await res.json();
-            if (data.version) {
-                document.getElementById('app-version').textContent = 'v' + data.version;
+        // 1. Lausche auf Nachrichten vom Service Worker
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && (event.data.type === 'VERSION_INFO' || event.data.type === 'SW_ACTIVATED')) {
+                document.getElementById('app-version').textContent = 'v' + event.data.version;
             }
-        } catch (e) {
-            document.getElementById('app-version').textContent = '';
+        });
+
+        // 2. Sobald der SW bereit ist, frage die Version ab
+        const reg = await navigator.serviceWorker.ready;
+        if (reg.active) {
+            reg.active.postMessage({ action: 'GET_VERSION' });
         }
     }
     inputArea.addEventListener('input', translate);
@@ -806,6 +809,7 @@
 
         ['animSpecial','animArrow0','animArrow1','animArrow2','animArrow3',
          'tagB-i','tagB-rest','tagB-cons',
+         'blockB-i','blockB-rest','tagB-cons',
          'blockB-i','blockB-rest','blockB-cons','animResult','animAussprache'
         ].forEach(id=>resetEl(id,'0'));
 
@@ -991,9 +995,7 @@
                     const manifestRes = await fetch('manifest.json');
                     const manifestData = await manifestRes.json();
                     const version = manifestData.version || '1.0.0';
-                    
-                    const reg = await navigator.serviceWorker.register('./sw.js?v=' + version);
-                    console.log('Service Worker registriert, Version:', version);
+                    const reg = await navigator.serviceWorker.register('./sw.js');
 
                     function createUpdateBanner(reg){
                         if(document.getElementById('swUpdateBanner')) return;
@@ -1049,3 +1051,4 @@
     </script>
 </body>
 </html>
+
