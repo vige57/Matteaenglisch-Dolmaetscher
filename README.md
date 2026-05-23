@@ -32,21 +32,27 @@ Wir nutzen keine manuell versionierten Dateien (`Mattenenglisch_v1_x_x.html`) me
 1. Lade **ausschließlich** die Datei `src/index.html` in deinen KI-Chat hoch.
 2. Lass die KI die Anpassungen vornehmen.
 3. Speichere die Änderungen wieder in exakt derselben Datei (`src/index.html`) ab.
-4. Fertig! Sobald du die Datei auf GitHub pushst, übernimmt das System den Rest.
+4. Fertig! Sobald du die Datei auf GitHub pushst (via Pull Request auf den `main`-Branch), übernimmt das System den Rest.
 
 ---
 
-## 🚀 Release- & Deployment-Automatisierung
+## 🚀 Release- & Deployment-Automatisierung (Orchestrierung)
 
-Dieses Projekt arbeitet mit vollautomatisierten GitHub Actions. Sobald eine Änderung am Code im Ordner `src/` auf den `main`-Branch gepusht wird, passieren zwei Dinge:
+Dieses Projekt arbeitet mit vollautomatisierten, miteinander verketteten GitHub Actions. Sobald echter Code im Ordner `src/` auf den `main`-Branch gemergt wird, startet eine automatische Staffelübergabe:
 
 ### 1. Auto Version Bump
-Das System liest die alte Version aus der `src/sw.js` aus, erhöht die Patch-Version (z. B. `1.7.8` → `1.7.9`) und schreibt diese neue Version automatisch in die `sw.js` und `manifest.json`.
+Als Erstes startet automatisch das Skript zur Versionierung. Es liest die alte Version aus der `src/sw.js` aus, erhöht die Patch-Version (z. B. **1.7.8** → **1.7.9**), aktualisiert die `sw.js` sowie die `manifest.json` und speichert (committet) diese Änderung selbstständig im `main`-Branch.
 
 ### 2. Auto Deployment (GitHub Pages)
-Anschließend greift sich GitHub Pages **nur** den Ordner `src/` und veröffentlicht ihn als Live-Website. Dadurch sind deine Prompts und Infrastruktur-Dateien niemals öffentlich im Web sichtbar.
+Diese zweite Action wartet geduldig im Hintergrund. Sobald die *Auto Version Bump*-Action erfolgreich abgeschlossen ist, übernimmt sie das Staffelholz. Sie greift sich **nur** den Ordner `src/` (nun inklusive der brandneuen Versionsnummer) und veröffentlicht ihn als Live-Website. Dadurch sind Prompts und Infrastruktur-Dateien niemals öffentlich im Web sichtbar.
 
-> **Wichtig:** Eine Änderung, die *außerhalb* des `src/`-Ordners passiert (z. B. wenn du einen neuen Prompt im `.ai_prompts`-Ordner anlegst), löst diese Aktionen **nicht** aus. Die Live-Website und die Versionsnummer bleiben in diesem Fall unberührt.
+> **Wichtig:** Änderungen, die *außerhalb* des `src/`-Ordners passieren (z. B. wenn du einen neuen Prompt im `.ai_prompts`-Ordner anlegst), lösen diese automatische Kette **nicht** aus.
+
+### 🎛️ Manueller Start
+Beide Workflows können bei Bedarf auch jederzeit manuell direkt über die GitHub-Oberfläche gestartet werden:
+1. Wechsle auf GitHub in den Reiter **Actions**.
+2. Wähle links den gewünschten Workflow aus (z. B. *Deploy PWA to GitHub Pages*).
+3. Klicke rechts auf das Dropdown-Menü **Run workflow** und bestätige den Start.
 
 ---
 
