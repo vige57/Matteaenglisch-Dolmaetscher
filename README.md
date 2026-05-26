@@ -23,19 +23,59 @@ Um das Projekt übersichtlich zu halten und die Zusammenarbeit mit KI-Assistente
 ```
 
 ---
+
 ## 👨‍💻 Workflow für die Entwicklung (mit Claude & Co.)
 
 Wir nutzen keine manuell versionierten Dateien (`Mattenenglisch_v1_x_x.html`) mehr. Zudem ist der Haupt-Branch (`main`) geschützt – direkte Änderungen daran sind blockiert, um die Qualität zu sichern.
 
 **So arbeitest du sauber an neuen Features:**
 
-1. **Branch erstellen:** Erstelle in VS Code einen neuen, separaten Feature-Branch (z. B. `neues-feature`) und wechsle dorthin.
-2. **KI-Unterstützung nutzen:** Lade **ausschließlich** die Datei `src/index.html` in deinen KI-Chat (z. B. Claude) hoch. Lass die KI die gewünschten Anpassungen vornehmen.
-3. **Lokal speichern & Committen:** Speichere die von der KI gelieferten Änderungen wieder in exakt derselben Datei (`src/index.html`) ab (überschreiben). Erfasse die Änderungen in VS Code (Staging) und mache einen Commit (z. B. "Neues Vokal-Feature hinzugefügt").
-4. **Auf GitHub pushen:** Pushe deinen neuen Branch auf das Remote-Repository (`git push origin neues-feature`).
-5. **Pull Request (PR) erstellen:** Wechsle in den Browser zu GitHub. Dort taucht nun ein grüner Button **Compare & pull request** auf. Klicke darauf, um deine Änderungen offiziell zur Integration in den `main`-Branch vorzuschlagen.
-6. **PR annehmen (Mergen):** Prüfe die Änderungen kurz und klicke auf **Merge pull request**. Dein Feature ist nun offiziell im Hauptcode! *(Der alte Feature-Branch wird danach automatisch gelöscht, um Ordnung zu halten).*
-7. **Zurücklehnen:** Ab hier übernehmen unsere Automaten! Die GitHub Actions starten sofort im Hintergrund, erhöhen die Versionsnummer (`Auto Version Bump`) und veröffentlichen die neue App-Version direkt auf GitHub Pages.
+### 1. Branch erstellen
+Erstelle einen neuen, separaten Feature-Branch und wechsle dorthin. Wähle einen Namen ohne Leerzeichen (z. B. `neues-feature`).
+* **💻 VS Code:** Klicke ganz unten links in der blauen Statusleiste auf `main` (oder auf das Branch-Symbol), wähle **Create new branch...** und tippe den Namen ein.
+* **⌨️ Terminal:** 
+```bash
+git checkout -b neues-feature
+```
+
+### 2. KI-Unterstützung nutzen
+Lade **ausschließlich** die Datei `src/index.html` in deinen KI-Chat (z. B. Claude) hoch. Lass die KI die gewünschten Anpassungen vornehmen.
+
+### 3. Lokal speichern & Committen
+Speichere die von der KI gelieferten Änderungen wieder in exakt derselben Datei (`src/index.html`) ab und erstelle einen Commit mit einer kurzen Beschreibung.
+* **💻 VS Code:** Gehe links auf das Symbol für **Quellverwaltung** (Source Control). Klicke beim geänderten File auf das `+` (Stage Changes). Schreibe oben eine Nachricht (z.B. "Neues Feature") und klicke auf **Commit**.
+* **⌨️ Terminal:** 
+```bash
+  git add src/index.html
+  git commit -m "Kurze Beschreibung: Neues Vokal-Feature hinzugefügt"
+  ```
+
+### 4. Auf GitHub pushen
+Lade deinen neuen Branch auf das Remote-Repository hoch.
+* **💻 VS Code:** Klicke in der Quellverwaltung auf den blauen Button **Publish Branch** (oder auf **Sync Changes**).
+* **⌨️ Terminal:** 
+```bash
+  git push -u origin neues-feature
+  ```
+
+### 5. Pull Request (PR) erstellen
+*Dieser Schritt findet immer im Browser statt.*
+Wechsle zu GitHub. Dort taucht nun oben ein grüner Button **Compare & pull request** auf. Klicke darauf, um deine Änderungen offiziell zur Integration in den `main`-Branch vorzuschlagen.
+
+### 6. PR annehmen (Mergen)
+Prüfe die Änderungen kurz und klicke auf **Merge pull request**. Dein Feature ist nun offiziell im Hauptcode! *(Der alte Feature-Branch wird danach auf GitHub automatisch gelöscht, um Ordnung zu halten).*
+
+### 7. Zurücklehnen (Automatisierung)
+Ab hier übernehmen unsere Automaten! Die GitHub Actions starten sofort im Hintergrund, erhöhen die Versionsnummer (`Auto Version Bump`) und veröffentlichen die neue App-Version direkt auf GitHub Pages.
+
+### 8. Lokal wieder synchronisieren
+Da der Bot die Versionsnummer auf GitHub erhöht hat, musst du deinen lokalen Rechner wieder auf den neuesten Stand bringen, bevor du das nächste Feature startest.
+* **💻 VS Code:** Klicke unten links auf deinen Branch-Namen und wechsle zurück zu `main`. Klicke dann in der Quellverwaltung auf **Sync Changes** (oder auf die kleinen Pfeile unten in der Leiste).
+* **⌨️ Terminal:** 
+```bash
+  git checkout main
+  git pull origin main
+  ```
 
 ---
 
