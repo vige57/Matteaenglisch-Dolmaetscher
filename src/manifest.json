@@ -1,7 +1,7 @@
 {
   "name": "Matteänglisch-Dolmetscher",
   "short_name": "Matteänglisch",
-  "version": "1.7.14",
+  "version": "1.7.15",
   "description": "Ein Übersetzer für Matteänglisch (Berner Geheimsprache).",
   "start_url": "./index.html",
   "display": "standalone",
