@@ -4,7 +4,7 @@ Ein interaktiver Übersetzer für Matteänglisch (Berner Geheimsprache), optimie
 
 ---
 
-## 📂 Die neue Projektstruktur (Wichtig für Entwickler & KI)
+## 📂 Die Projektstruktur (Wichtig für Entwickler & KI)
 
 Um das Projekt übersichtlich zu halten und die Zusammenarbeit mit KI-Assistenten (wie Claude) zu optimieren, ist das Repository strikt in verschiedene Bereiche unterteilt:
 
@@ -14,10 +14,10 @@ Um das Projekt übersichtlich zu halten und die Zusammenarbeit mit KI-Assistente
 │                      # Dieser Ordner wird von KIs im Code-Editor ignoriert, um Tokens zu sparen.
 ├── .github/workflows/ # ⚙️ Pipelines: Automatisches Deployment und Versionierung.
 ├── src/               # 🚀 HIER LEBT DIE APP: Der einzige Ordner für den eigentlichen Code!
+│   ├── images/        # -> 🖼️ Statische Assets (Favicon, PWA-Icons, Bilder)
 │   ├── index.html     # -> Die Haupt-Arbeitsdatei (Bitte nur noch diese bearbeiten!)
 │   ├── sw.js          # -> Service Worker (steuert Offline-Modus & Version)
-│   ├── manifest.json  # -> App-Metadaten
-│   └── icon-*.png     # -> App-Logos
+│   └── manifest.json  # -> App-Metadaten (PWA-Konfiguration)
 ├── .*ignore           # 🛡️ Diverse Ignore-Dateien (Git, Copilot, Cursor etc.)
 └── README.md          # 📖 Diese Dokumentation
 ```
