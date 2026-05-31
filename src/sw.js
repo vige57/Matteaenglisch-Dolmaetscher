@@ -9,8 +9,9 @@ const VERSION = '1.7.14';
 const PRECACHE_ASSETS = [
   './index.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
+  './images/icon-192.png',
+  './images/icon-512.png',
+  './images/favicon.ico',
   './offline.html'
 ];
 
@@ -99,7 +100,6 @@ self.addEventListener('fetch', (event)=>{
     event.respondWith((async ()=>{
       const cache = await caches.open(CACHE_NAME);
       const cached = await cache.match(req);
-      console.log(req.destination, req.url, 'Cache hit:', !!cached);
       const networkPromise = fetch(req).then(res=>{ 
           if(res.ok) cache.put(req,res.clone()).catch(()=>{}); 
           return res; 
