@@ -5,7 +5,7 @@
 */
 
 const APP_PREFIX = 'matte-dolmetscher-';
-const VERSION = '1.7.13'; 
+const VERSION = '1.7.14'; 
 const PRECACHE_ASSETS = [
   './index.html',
   './manifest.json',
