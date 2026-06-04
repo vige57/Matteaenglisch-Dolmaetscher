@@ -3,6 +3,7 @@
 Ein interaktiver Übersetzer für Matteänglisch (Berner Geheimsprache), optimiert als Progressive Web App (PWA).
 [Matteänglisch-Club Bärn] (https://www.matteaenglisch.ch/)
 [Matteänglisch-Dolmätscher mit Lernfunktion] (https://vige57.github.io/Matteaenglisch-Dolmaetscher/)
+
 ---
 
 ## 📂 Die Projektstruktur (Wichtig für Entwickler & KI)
